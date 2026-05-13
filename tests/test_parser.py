@@ -386,6 +386,18 @@ def test_compound_after_yesterday() -> None:
     assert parse("1 year and 2 months after yesterday", TODAY) == date(2027, 7, 11)
 
 
+def test_compound_comma_before() -> None:
+    assert parse("2 years, 3 months before Dec. 1, 2025", TODAY) == date(2023, 9, 1)
+
+
+def test_compound_comma_three_units() -> None:
+    assert parse("1 year, 2 months, 3 days after yesterday", TODAY) == date(2027, 7, 14)
+
+
+def test_compound_no_comma() -> None:
+    assert parse("2 years 3 months before Dec. 1, 2025", TODAY) == date(2023, 9, 1)
+
+
 # --- before/after with months/years ---
 
 

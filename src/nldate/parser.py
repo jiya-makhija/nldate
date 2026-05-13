@@ -276,39 +276,60 @@ def parse(s: str, today: date | None = None) -> date:
             return _resolve_after(m.group(3).strip(), today, n, unit)
         raise ValueError(f"Could not parse date: {s}")
 
-    # --- compound: N years and M months after/before target ---
-    m = re.match(
-        r"(\S+)\s+years?\s+and\s+(\S+)\s+months?\s+(after|before)\s+(.+)$",
-        s,
-        re.IGNORECASE,
-    )
+    # --- general compound: multiple N-unit pairs before/after target ---
+    # Handles: "2 years, 3 months before X", "1 year and 2 months after X",
+    #          "2 years, 3 months, 1 day before X", etc.
+    m = re.match(r"(.+)\s+(before|after)\s+(.+)$", s, re.IGNORECASE)
     if m:
-        yn = _parse_number(m.group(1))
-        mn = _parse_number(m.group(2))
-        direction = m.group(3).lower()
-        target = m.group(4).strip()
-        if yn is not None and mn is not None:
-            base = _resolve_relative(target, today) or _parse_absolute_date(
-                target, today
-            )
-            if base is not None:
-                result = _add_months(base, yn * 12 + mn)
-                if direction == "before":
-                    ref = _resolve_relative(target, today) or _parse_absolute_date(
-                        target, today
-                    )
-                    if ref is not None:
-                        diff = (ref.year - result.year) * 12 + (
-                            ref.month - result.month
-                        )
-                        if diff > 0:
-                            result = _add_months(ref, -diff)
-                        else:
-                            diff = abs(diff)
-                            result = _add_months(ref, diff)
-                        return result
-                return result
-        raise ValueError(f"Could not parse date: {s}")
+        offset_str = m.group(1).strip()
+        direction = m.group(2).lower()
+        target = m.group(3).strip()
+
+        cleaned_offset = re.sub(r"[,\s]+and\s+", " ", offset_str)
+        cleaned_offset = re.sub(r",", " ", cleaned_offset)
+        cleaned_offset = re.sub(r"\s+", " ", cleaned_offset).strip()
+
+        pairs = re.findall(
+            r"(\S+)\s+(years?|months?|weeks?|days?)", cleaned_offset, re.IGNORECASE
+        )
+
+        if len(pairs) >= 2:
+            total_months = 0
+            total_days = 0
+            valid = True
+            for num_str, unit_str in pairs:
+                n = _parse_number(num_str)
+                if n is None:
+                    valid = False
+                    break
+                u: str | None = _UNIT_ALIASES.get(unit_str.lower())
+                if u is None:
+                    valid = False
+                    break
+                if u == "years":
+                    total_months += n * 12
+                elif u == "months":
+                    total_months += n
+                elif u == "weeks":
+                    total_days += n * 7
+                elif u == "days":
+                    total_days += n
+
+            if valid:
+                base: date | None = _resolve_relative(target, today)
+                if base is None:
+                    base = _parse_absolute_date(target, today)
+
+                if base is not None:
+                    if direction == "before":
+                        result = _add_months(base, -total_months)
+                        result -= timedelta(days=total_days)
+                    else:
+                        result = _add_months(base, total_months)
+                        result += timedelta(days=total_days)
+                    return result
+
+            raise ValueError(f"Could not parse date: {s}")
 
     # --- this WEEKDAY ---
     m = re.match(r"this (\w+)$", s, re.IGNORECASE)
