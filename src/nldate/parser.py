@@ -3,7 +3,13 @@ from datetime import date, timedelta
 
 
 WEEKDAYS = [
-    "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
 ]
 
 
@@ -12,6 +18,7 @@ def _parse_absolute_date(s: str) -> date | None:
     for fmt in ("%B %d, %Y", "%B %d %Y", "%b %d, %Y", "%b %d %Y"):
         try:
             from datetime import datetime
+
             return datetime.strptime(cleaned, fmt).date()
         except ValueError:
             continue

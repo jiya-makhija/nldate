@@ -48,6 +48,7 @@ def test_invalid_raises() -> None:
 
 # --- singular variants ---
 
+
 def test_in_1_day() -> None:
     assert parse("in 1 day", TODAY) == date(2026, 5, 13)
 
@@ -62,6 +63,7 @@ def test_1_week_from_now() -> None:
 
 # --- day after / before ---
 
+
 def test_day_after_tomorrow() -> None:
     assert parse("day after tomorrow", TODAY) == date(2026, 5, 14)
 
@@ -72,11 +74,13 @@ def test_day_before_yesterday() -> None:
 
 # --- zero edge case ---
 
+
 def test_in_0_days() -> None:
     assert parse("in 0 days", TODAY) == TODAY
 
 
 # --- more weekday combinations ---
+
 
 def test_next_monday() -> None:
     assert parse("next Monday", TODAY) == date(2026, 5, 18)
@@ -96,6 +100,7 @@ def test_last_wednesday() -> None:
 
 # --- absolute date formats ---
 
+
 def test_abbreviated_month() -> None:
     assert parse("Dec 1, 2026", TODAY) == date(2026, 12, 1)
 
@@ -110,6 +115,7 @@ def test_abbreviated_ordinal_no_comma() -> None:
 
 # --- relative before today / yesterday ---
 
+
 def test_3_days_before_today() -> None:
     assert parse("3 days before today", TODAY) == date(2026, 5, 9)
 
@@ -119,6 +125,7 @@ def test_1_week_before_yesterday() -> None:
 
 
 # --- case and whitespace ---
+
 
 def test_whitespace() -> None:
     assert parse("  today  ", TODAY) == TODAY
@@ -133,6 +140,7 @@ def test_upper_case() -> None:
 
 
 # --- more error cases ---
+
 
 def test_empty_string_raises() -> None:
     with pytest.raises(ValueError):
