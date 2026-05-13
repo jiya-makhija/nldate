@@ -139,6 +139,80 @@ def test_upper_case() -> None:
     assert parse("NEXT TUESDAY", TODAY) == date(2026, 5, 19)
 
 
+# --- more absolute date formats ---
+
+
+def test_iso_with_slashes() -> None:
+    assert parse("2025/12/04", TODAY) == date(2025, 12, 4)
+
+
+def test_iso_with_dots() -> None:
+    assert parse("2025.12.04", TODAY) == date(2025, 12, 4)
+
+
+def test_us_slash_format() -> None:
+    assert parse("12/04/2025", TODAY) == date(2025, 12, 4)
+
+
+def test_us_short_year() -> None:
+    assert parse("12/04/25", TODAY) == date(2025, 12, 4)
+
+
+def test_us_dash_format() -> None:
+    assert parse("12-04-2025", TODAY) == date(2025, 12, 4)
+
+
+def test_eu_day_before_month() -> None:
+    assert parse("1 December 2026", TODAY) == date(2026, 12, 1)
+
+
+def test_eu_abbreviated() -> None:
+    assert parse("1 Dec 2026", TODAY) == date(2026, 12, 1)
+
+
+def test_abbreviated_with_period() -> None:
+    assert parse("Dec. 1, 2026", TODAY) == date(2026, 12, 1)
+
+
+def test_abbreviated_period_ordinal() -> None:
+    assert parse("Dec. 1st, 2026", TODAY) == date(2026, 12, 1)
+
+
+def test_eu_with_period() -> None:
+    assert parse("1 Dec. 2026", TODAY) == date(2026, 12, 1)
+
+
+def test_eu_abbreviated_with_comma() -> None:
+    assert parse("1 Dec, 2026", TODAY) == date(2026, 12, 1)
+
+
+# --- more relative patterns ---
+
+
+def test_n_days_ago() -> None:
+    assert parse("3 days ago", TODAY) == date(2026, 5, 9)
+
+
+def test_n_weeks_ago() -> None:
+    assert parse("2 weeks ago", TODAY) == date(2026, 4, 28)
+
+
+def test_next_week() -> None:
+    assert parse("next week", TODAY) == date(2026, 5, 19)
+
+
+def test_last_week() -> None:
+    assert parse("last week", TODAY) == date(2026, 5, 5)
+
+
+def test_the_day_after_tomorrow() -> None:
+    assert parse("the day after tomorrow", TODAY) == date(2026, 5, 14)
+
+
+def test_the_day_before_yesterday() -> None:
+    assert parse("the day before yesterday", TODAY) == date(2026, 5, 10)
+
+
 # --- more error cases ---
 
 
