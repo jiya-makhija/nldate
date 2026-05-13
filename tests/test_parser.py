@@ -253,3 +253,153 @@ def test_invalid_weekday_next_raises() -> None:
 def test_invalid_weekday_last_raises() -> None:
     with pytest.raises(ValueError):
         parse("last foo", TODAY)
+
+
+# --- months / years in relative ---
+
+
+def test_in_3_months() -> None:
+    assert parse("in 3 months", TODAY) == date(2026, 8, 12)
+
+
+def test_in_1_year() -> None:
+    assert parse("in 1 year", TODAY) == date(2027, 5, 12)
+
+
+def test_3_months_ago() -> None:
+    assert parse("3 months ago", TODAY) == date(2026, 2, 12)
+
+
+def test_1_year_ago() -> None:
+    assert parse("1 year ago", TODAY) == date(2025, 5, 12)
+
+
+def test_3_months_from_now() -> None:
+    assert parse("3 months from now", TODAY) == date(2026, 8, 12)
+
+
+# --- this weekday ---
+
+
+def test_this_wednesday() -> None:
+    assert parse("this Wednesday", TODAY) == date(2026, 5, 13)
+
+
+def test_this_tuesday() -> None:
+    assert parse("this Tuesday", TODAY) == TODAY
+
+
+# --- next/last month/year ---
+
+
+def test_next_month() -> None:
+    assert parse("next month", TODAY) == date(2026, 6, 12)
+
+
+def test_last_month() -> None:
+    assert parse("last month", TODAY) == date(2026, 4, 12)
+
+
+def test_next_year() -> None:
+    assert parse("next year", TODAY) == date(2027, 5, 12)
+
+
+def test_last_year() -> None:
+    assert parse("last year", TODAY) == date(2025, 5, 12)
+
+
+# --- word numbers ---
+
+
+def test_two_weeks_from_now() -> None:
+    assert parse("two weeks from now", TODAY) == date(2026, 5, 26)
+
+
+def test_three_days_ago() -> None:
+    assert parse("three days ago", TODAY) == date(2026, 5, 9)
+
+
+def test_a_week_from_now() -> None:
+    assert parse("a week from now", TODAY) == date(2026, 5, 19)
+
+
+def test_a_month_ago() -> None:
+    assert parse("a month ago", TODAY) == date(2026, 4, 12)
+
+
+# --- end / start of month / year ---
+
+
+def test_end_of_month() -> None:
+    assert parse("end of the month", TODAY) == date(2026, 5, 31)
+
+
+def test_end_of_year() -> None:
+    assert parse("end of the year", TODAY) == date(2026, 12, 31)
+
+
+def test_start_of_month() -> None:
+    assert parse("start of the month", TODAY) == date(2026, 5, 1)
+
+
+def test_start_of_year() -> None:
+    assert parse("start of the year", TODAY) == date(2026, 1, 1)
+
+
+# --- no-year absolute dates ---
+
+
+def test_december_first_no_year() -> None:
+    assert parse("December 1st", TODAY) == date(2026, 12, 1)
+
+
+def test_jan_1_no_year() -> None:
+    assert parse("Jan 1", TODAY) == date(2026, 1, 1)
+
+
+# --- of-format dates ---
+
+
+def test_1st_of_january() -> None:
+    assert parse("1st of January 2025", TODAY) == date(2025, 1, 1)
+
+
+def test_the_1st_of_january() -> None:
+    assert parse("the 1st of January", TODAY) == date(2026, 1, 1)
+
+
+# --- standalone weekday ---
+
+
+def test_standalone_monday() -> None:
+    assert parse("monday", TODAY) == date(2026, 5, 18)
+
+
+def test_standalone_tuesday() -> None:
+    assert parse("tuesday", TODAY) == date(2026, 5, 19)
+
+
+# --- compound offsets ---
+
+
+def test_compound_after_yesterday() -> None:
+    assert parse("1 year and 2 months after yesterday", TODAY) == date(2027, 7, 11)
+
+
+# --- before/after with months/years ---
+
+
+def test_3_months_before_date() -> None:
+    assert parse("3 months before December 1st, 2026", TODAY) == date(2026, 9, 1)
+
+
+def test_2_years_after_date() -> None:
+    assert parse("2 years after December 1st, 2026", TODAY) == date(2028, 12, 1)
+
+
+# --- invalid word number raises ---
+
+
+def test_invalid_word_number_raises() -> None:
+    with pytest.raises(ValueError):
+        parse("in foo days", TODAY)
