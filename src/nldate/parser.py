@@ -71,6 +71,16 @@ def _resolve_before(target: str, today: date, n: int) -> date:
     raise ValueError(f"Could not parse date before {target}")
 
 
+def _resolve_after(target: str, today: date, n: int) -> date:
+    rel = _resolve_relative(target, today)
+    if rel is not None:
+        return rel + timedelta(days=n)
+    abs_date = _parse_absolute_date(target)
+    if abs_date is not None:
+        return abs_date + timedelta(days=n)
+    raise ValueError(f"Could not parse date after {target}")
+
+
 def parse(s: str, today: date | None = None) -> date:
     if today is None:
         today = date.today()
@@ -97,6 +107,10 @@ def parse(s: str, today: date | None = None) -> date:
     if m:
         return today + timedelta(days=int(m.group(1)))
 
+    m = re.match(r"in (\d+) weeks?$", s, re.IGNORECASE)
+    if m:
+        return today + timedelta(weeks=int(m.group(1)))
+
     m = re.match(r"(\d+) days? from now$", s, re.IGNORECASE)
     if m:
         return today + timedelta(days=int(m.group(1)))
@@ -120,6 +134,14 @@ def parse(s: str, today: date | None = None) -> date:
     m = re.match(r"(\d+) weeks? before (.+)$", s, re.IGNORECASE)
     if m:
         return _resolve_before(m.group(2).strip(), today, int(m.group(1)) * 7)
+
+    m = re.match(r"(\d+) days? after (.+)$", s, re.IGNORECASE)
+    if m:
+        return _resolve_after(m.group(2).strip(), today, int(m.group(1)))
+
+    m = re.match(r"(\d+) weeks? after (.+)$", s, re.IGNORECASE)
+    if m:
+        return _resolve_after(m.group(2).strip(), today, int(m.group(1)) * 7)
 
     m = re.match(r"next (\w+)$", s, re.IGNORECASE)
     if m:
