@@ -213,6 +213,30 @@ def test_the_day_before_yesterday() -> None:
     assert parse("the day before yesterday", TODAY) == date(2026, 5, 10)
 
 
+def test_in_2_weeks() -> None:
+    assert parse("in 2 weeks", TODAY) == date(2026, 5, 26)
+
+
+def test_in_1_week() -> None:
+    assert parse("in 1 week", TODAY) == date(2026, 5, 19)
+
+
+def test_days_after_date() -> None:
+    assert parse("2 days after July 4, 2026", TODAY) == date(2026, 7, 6)
+
+
+def test_weeks_after_date() -> None:
+    assert parse("2 weeks after July 4, 2026", TODAY) == date(2026, 7, 18)
+
+
+def test_week_after_today() -> None:
+    assert parse("1 week after today", TODAY) == date(2026, 5, 19)
+
+
+def test_days_after_yesterday() -> None:
+    assert parse("3 days after yesterday", TODAY) == date(2026, 5, 14)
+
+
 # --- more error cases ---
 
 
