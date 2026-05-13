@@ -15,7 +15,7 @@ WEEKDAYS = [
 
 def _parse_absolute_date(s: str) -> date | None:
     cleaned = re.sub(r"(\d+)(st|nd|rd|th)", r"\1", s)
-    for fmt in ("%B %d, %Y", "%B %d %Y", "%b %d, %Y", "%b %d %Y"):
+    for fmt in ("%Y-%m-%d", "%B %d, %Y", "%B %d %Y", "%b %d, %Y", "%b %d %Y"):
         try:
             from datetime import datetime
 
