@@ -15,13 +15,32 @@ WEEKDAYS = [
 
 def _parse_absolute_date(s: str) -> date | None:
     cleaned = re.sub(r"(\d+)(st|nd|rd|th)", r"\1", s)
+    cleaned = re.sub(
+        r"\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.",
+        r"\1",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+
     for fmt in (
         "%Y-%m-%d",
         "%Y/%m/%d",
+        "%Y.%m.%d",
+        "%m/%d/%Y",
+        "%m/%d/%y",
+        "%m-%d-%Y",
+        "%m-%d-%y",
+        "%m.%d.%Y",
+        "%m.%d.%y",
         "%B %d, %Y",
         "%B %d %Y",
         "%b %d, %Y",
         "%b %d %Y",
+        "%d %B %Y",
+        "%d %b %Y",
+        "%d %B, %Y",
+        "%d %b, %Y",
     ):
         try:
             from datetime import datetime
@@ -64,10 +83,15 @@ def parse(s: str, today: date | None = None) -> date:
         return today + timedelta(days=1)
     if s == "yesterday":
         return today - timedelta(days=1)
-    if s == "day after tomorrow":
+    if s in ("day after tomorrow", "the day after tomorrow"):
         return today + timedelta(days=2)
-    if s == "day before yesterday":
+    if s in ("day before yesterday", "the day before yesterday"):
         return today - timedelta(days=2)
+
+    if s == "next week":
+        return today + timedelta(weeks=1)
+    if s == "last week":
+        return today - timedelta(weeks=1)
 
     m = re.match(r"in (\d+) days?$", s, re.IGNORECASE)
     if m:
@@ -80,6 +104,14 @@ def parse(s: str, today: date | None = None) -> date:
     m = re.match(r"(\d+) weeks? from now$", s, re.IGNORECASE)
     if m:
         return today + timedelta(weeks=int(m.group(1)))
+
+    m = re.match(r"(\d+) days? ago$", s, re.IGNORECASE)
+    if m:
+        return today - timedelta(days=int(m.group(1)))
+
+    m = re.match(r"(\d+) weeks? ago$", s, re.IGNORECASE)
+    if m:
+        return today - timedelta(weeks=int(m.group(1)))
 
     m = re.match(r"(\d+) days? before (.+)$", s, re.IGNORECASE)
     if m:
